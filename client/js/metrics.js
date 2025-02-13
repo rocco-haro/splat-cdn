@@ -213,28 +213,29 @@ class MetricsManager {
             throw new Error('experimentId is required');
         }
 
-        const results = this.getResults();
-        const baseUrl = CONFIG.endpoints.services[CONFIG.environment];
+        // TODO
+        // const results = this.getResults();
+        // const baseUrl = CONFIG.endpoints.services[CONFIG.environment];
         
-        try {
-            const response = await fetch(`${baseUrl}/results/${experimentId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(results)
-            });
+        // try {
+        //     const response = await fetch(`${baseUrl}/results/${experimentId}`, {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json'
+        //         },
+        //         body: JSON.stringify(results)
+        //     });
 
-            if (!response.ok) {
-                throw new Error(`Failed to submit results: ${response.statusText}`);
-            }
+        //     if (!response.ok) {
+        //         throw new Error(`Failed to submit results: ${response.statusText}`);
+        //     }
 
-            console.log('Results submitted successfully');
-            return await response.json();
-        } catch (error) {
-            console.error('Error submitting results:', error);
-            throw error;
-        }
+        //     console.log('Results submitted successfully');
+        //     return await response.json();
+        // } catch (error) {
+        //     console.error('Error submitting results:', error);
+        //     throw error;
+        // }
     }
     setMetricsUpdateCallback(callback) {
         this.onMetricsUpdate = callback;
