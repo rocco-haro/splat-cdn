@@ -1,0 +1,29 @@
+# Virtual environment
+venv/
+.env
+.venv
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Generated data
+generated/
+*.log
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Pytest
+.pytest_cache/
+
+# Experiment-specific files
+experiments/**/config.json

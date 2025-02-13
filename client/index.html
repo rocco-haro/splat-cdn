@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Splat CDN Test Client</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="controls">
+            <button id="startTest">Start Test</button>
+            <button id="exportData">Export Results</button>
+            <select id="testScenario">
+                <option value="teleport">Teleport Test</option>
+                <option value="spiral">Spiral Test</option>
+            </select>
+            <select id="cdnArchitecture">
+                <option value="single-tier">Single-Tier CDN</option>
+                <option value="two-tier">Two-Tier CDN</option>
+            </select>
+        </div>
+
+        <div class="charts">
+            <div class="chart-container">
+                <canvas id="pathChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="cacheChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="latencyChart"></canvas>
+            </div>
+        </div>
+
+        <div class="metrics">
+            <div>Cache Hits: <span id="cacheHits">0</span></div>
+            <div>Cache Misses: <span id="cacheMisses">0</span></div>
+            <div>Average Latency: <span id="avgLatency">0</span>ms</div>
+            <div>Current Position: <span id="currentPos">-</span></div>
+        </div>
+    </div>
+
+    <!-- Script imports in correct order -->
+    <script src="js/config.js"></script>
+    <script src="js/experiment.js"></script>
+    <script src="js/metrics.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/path.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,4 +1,3 @@
-# mock-data-generator/generator.py
 import argparse
 import json
 from pathlib import Path
@@ -33,21 +32,39 @@ class ExperimentGenerator:
         
         # Convert paths to JSON-serializable format
         paths_json = {
-            name: {
-                "points": [
-                    {
-                        "position": {
-                            "x": p.position.x,
-                            "y": p.position.y,
-                            "z": p.position.z
-                        },
-                        "timestamp": p.timestamp,
-                        "expected_splats": p.expected_splats
+            "cdn": {
+                "domain": "d1234.cloudfront.net",
+                "type": "single_tier"
+            },
+            "scenarios": {
+                name: {
+                    "points": [
+                        {
+                            "position": {
+                                "x": p.position.x,
+                                "y": p.position.y,
+                                "z": p.position.z
+                            },
+                            "timestamp": p.timestamp,
+                            "expected_splats": p.expected_splats
+                        }
+                        for p in path.points
+                    ]
+                }
+                for name, path in paths.items()
+            },
+            "config": {
+                "scenarios": {
+                    "teleport": {
+                        "dwell_duration": config.scenarios.teleport.dwell_duration,
+                        "teleport_duration": config.scenarios.teleport.teleport_duration,
+                        "post_teleport_duration": config.scenarios.teleport.post_teleport_duration
+                    },
+                    "spiral": {
+                        "duration": config.scenarios.spiral.duration
                     }
-                    for p in path.points
-                ]
+                }
             }
-            for name, path in paths.items()
         }
         
         # Write grid map
@@ -110,7 +127,7 @@ class ExperimentGenerator:
         # Check required scenarios exist
         required_scenarios = ["teleport", "spiral"]
         for scenario in required_scenarios:
-            if scenario not in paths:
+            if scenario not in paths["scenarios"]:
                 raise ValueError(f"Missing required test scenario: {scenario}")
                 
         print(f"Successfully validated experiment data in {output_dir}")

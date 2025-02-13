@@ -1,4 +1,4 @@
-# splat_generator.py
+# mock-data-generator/splat_generator.py
 import random
 from pathlib import Path
 from typing import Dict, List, Tuple

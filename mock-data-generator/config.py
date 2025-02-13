@@ -1,4 +1,3 @@
-# config.py
 from dataclasses import dataclass
 from pathlib import Path
 import json
@@ -36,12 +35,28 @@ class SuccessMetrics:
     min_preload_success_rate: float  # Minimum successful preloads
 
 @dataclass
+class TeleportScenarioConfig:
+    dwell_duration: float  # Time to stay in initial position (seconds)
+    teleport_duration: float  # Time for teleport transition (seconds)
+    post_teleport_duration: float  # Time to move after teleport (seconds)
+
+@dataclass
+class SpiralScenarioConfig:
+    duration: float  # Total duration of spiral movement (seconds)
+
+@dataclass
+class ScenarioConfig:
+    teleport: TeleportScenarioConfig
+    spiral: SpiralScenarioConfig
+
+@dataclass
 class ExperimentConfig:
     grid: GridDimensions
     splat: SplatConfig
     cache: CacheConfig
     network: NetworkConfig
     metrics: SuccessMetrics
+    scenarios: ScenarioConfig
 
 class ConfigLoader:
     def __init__(self, experiments_dir: Path):
@@ -83,6 +98,16 @@ class ConfigLoader:
                 min_cache_hit_rate=data["metrics"]["min_cache_hit_rate"],
                 max_latency_ms=data["metrics"]["max_latency_ms"],
                 min_preload_success_rate=data["metrics"]["min_preload_success_rate"]
+            ),
+            scenarios=ScenarioConfig(
+                teleport=TeleportScenarioConfig(
+                    dwell_duration=data["scenarios"]["teleport"]["dwell_duration"],
+                    teleport_duration=data["scenarios"]["teleport"]["teleport_duration"],
+                    post_teleport_duration=data["scenarios"]["teleport"]["post_teleport_duration"]
+                ),
+                spiral=SpiralScenarioConfig(
+                    duration=data["scenarios"]["spiral"]["duration"]
+                )
             )
         )
     
@@ -90,15 +115,15 @@ class ConfigLoader:
         """Create a default configuration file for an experiment"""
         config = {
             "grid": {
-                "width": 10,
-                "height": 10,
-                "depth": 10,
-                "cell_size": 5.0,
+                "width": 20,
+                "height": 20,
+                "depth": 1,
+                "cell_size": 1.0,
                 "loading_radius": 2.0
             },
             "splat": {
                 "min_size": 100 * 1024,    # 100KB
-                "max_size": 10 * 1024 * 1024  # 10MB
+                "max_size": 1 * 1024 * 1024  # 1MB
             },
             "cache": {
                 "l1_size": 1 * 1024 * 1024 * 1024,  # 1GB
@@ -114,6 +139,16 @@ class ConfigLoader:
                 "min_cache_hit_rate": 0.99,
                 "max_latency_ms": 500.0,
                 "min_preload_success_rate": 0.95
+            },
+            "scenarios": {
+                "teleport": {
+                    "dwell_duration": 15.0,
+                    "teleport_duration": 0.2,
+                    "post_teleport_duration": 5.0
+                },
+                "spiral": {
+                    "duration": 30.0
+                }
             }
         }
         

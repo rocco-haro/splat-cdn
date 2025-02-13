@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Experiment Manager</title>
+</head>
+<body>
+    <h2>Experiment Manager Test</h2>
+    <button onclick="testLoad()">Load Experiment</button>
+    <button onclick="testSetScenario('teleport')">Set Teleport Scenario</button>
+    <button onclick="testSetScenario('spiral')">Set Spiral Scenario</button>
+    <button onclick="testGetPath()">Get Current Path</button>
+    <pre id="output"></pre>
+
+    <script src="js/config.js"></script>
+    <script src="js/experiment.js"></script>
+    <script>
+        function log(msg, data) {
+            const output = document.getElementById('output');
+            output.innerHTML += `\n${msg}\n${JSON.stringify(data, null, 2)}\n`;
+        }
+
+        async function testLoad() {
+            try {
+                const data = await experimentManager.loadExperiment();
+                log('Loaded experiment data:', data);
+            } catch (error) {
+                log('Error:', error.message);
+            }
+        }
+
+        function testSetScenario(type) {
+            try {
+                const scenario = experimentManager.setScenario(type);
+                log(`Set ${type} scenario:`, scenario);
+            } catch (error) {
+                log('Error:', error.message);
+            }
+        }
+
+        function testGetPath() {
+            try {
+                const path = experimentManager.getScenarioPath();
+                log('Current path:', path);
+            } catch (error) {
+                log('Error:', error.message);
+            }
+        }
+    </script>
+</body>
+</html>
