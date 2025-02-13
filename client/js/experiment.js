@@ -1,5 +1,4 @@
 // experiment.js
-
 class ExperimentManager {
     constructor() {
         this.experimentData = null;
@@ -69,5 +68,4 @@ class ExperimentManager {
     }
 }
 
-// Create global instance
 window.experimentManager = new ExperimentManager();

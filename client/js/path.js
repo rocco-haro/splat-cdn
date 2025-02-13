@@ -6,9 +6,8 @@ class PathManager {
         this.isRunning = false;
         this.lastTimestamp = null;
         this.animationFrameId = null;
-        this.onPositionUpdate = null;  // Callback for position updates
+        this.onPositionUpdate = null;
         this.requestedSplats = new Set();
-        this.protocolVersion = null; // Track the protocol version being used
     }
 
     initialize(path, onPositionUpdate) {
@@ -30,7 +29,6 @@ class PathManager {
         this.isRunning = true;
         this.lastTimestamp = null;
         
-        // Start metrics recording
         if (window.metricsManager) {
             const architecture = window.experimentManager.getCDNEndpoint().includes('two-tier') ? 
                 'two_tier' : 'single_tier';
@@ -51,7 +49,6 @@ class PathManager {
             this.animationFrameId = null;
         }
         
-        // Stop metrics recording
         if (window.metricsManager) {
             const results = window.metricsManager.stopRecording();
             console.log('Final metrics:', results);
@@ -73,10 +70,8 @@ class PathManager {
             this.lastTimestamp = timestamp;
         }
 
-        // Convert to seconds to match the path timestamps
         const currentTime = (timestamp - this.lastTimestamp) / 1000;
         
-        // Find the appropriate point in the path based on time
         while (this.currentPointIndex < this.currentPath.length) {
             const point = this.currentPath[this.currentPointIndex];
             
@@ -84,13 +79,8 @@ class PathManager {
                 break;
             }
 
-            // We've reached or passed this point's timestamp
-           // console.log(`Reached point ${this.currentPointIndex} at time ${currentTime}s:`, point);
-            
-            // Request splats for this position
             this.requestSplats(point.expected_splats);
             
-            // Update position
             if (this.onPositionUpdate) {
                 this.onPositionUpdate(point.position, point.expected_splats);
             }
@@ -124,17 +114,6 @@ class PathManager {
                 this.requestedSplats.add(splatId);
                 
                 const startTime = performance.now();
-                
-                // Create observer to capture protocol information
-                const observer = new PerformanceObserver((list) => {
-                    const entries = list.getEntries();
-                    entries.forEach(entry => {
-                        this.protocolVersion = entry.nextHopProtocol;
-                        console.log(`Request to ${entry.name} used protocol: ${this.protocolVersion}`);
-                    });
-                });
-                
-                observer.observe({ entryTypes: ['resource'] });
 
                 const response = await fetch(`${cdnEndpoint}/content/${splatId}`);
                 if (!response.ok) {
@@ -167,13 +146,6 @@ class PathManager {
             console.error('Error fetching splats:', error);
         }
     }
-
-    // New method to get current protocol version
-    getProtocolVersion() {
-        return this.protocolVersion;
-    }
-
 }
 
-// Create global instance
 window.pathManager = new PathManager();

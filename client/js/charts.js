@@ -211,7 +211,6 @@ class ChartManager {
 
     updateMetrics(metrics, timestamp) {
         const timeInSeconds = (timestamp - window.metricsManager.metrics.experiment_start) / 1000;
-        
         // Add new data points for cache hits
         this.metricsData.labels.push(timeInSeconds);
         this.metricsData.cacheHits.l1.push(metrics.l1_hits);
@@ -237,6 +236,7 @@ class ChartManager {
                 y: metrics.origin_latency
             });
         }
+
 
         // Update time range
         const maxTime = Math.max(...this.metricsData.labels);
@@ -315,7 +315,6 @@ class ChartManager {
             }
         };
 
-        // Reset all charts
         this.pathChart.data.datasets.forEach(dataset => dataset.data = []);
         this.cacheChart.data.datasets.forEach(dataset => dataset.data = []);
         this.latencyChart.data.datasets.forEach(dataset => dataset.data = []);
@@ -326,5 +325,4 @@ class ChartManager {
     }
 }
 
-// Create global instance
 window.chartManager = new ChartManager();

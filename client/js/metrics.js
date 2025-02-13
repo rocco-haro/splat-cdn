@@ -9,13 +9,11 @@ class MetricsManager {
             origin_hits: 0,
             total_requests: 0,
             total_latency: 0,
-            // Track current request latencies
             current_latencies: {
                 l1: null,
                 l2: null,
                 origin: null
             },
-            // Keep historical latencies for analysis
             historical_latencies: {
                 l1: [],
                 l2: [],
@@ -85,7 +83,6 @@ class MetricsManager {
 
         this.metrics.total_requests++;
         
-        // Track instantaneous latency based on cache status
         if (response && response.cache_status) {
             switch (response.cache_status) {
                 case 'l1_hit':
@@ -141,7 +138,6 @@ class MetricsManager {
         const totalRequests = this.metrics.total_requests || 1;
         const totalHits = this.metrics.l1_hits + this.metrics.l2_hits;
 
-        // Calculate statistics from historical latencies
         const l1Stats = this.calculateLatencyStats(this.metrics.historical_latencies.l1);
         const l2Stats = this.calculateLatencyStats(this.metrics.historical_latencies.l2);
         const originStats = this.calculateLatencyStats(this.metrics.historical_latencies.origin);
@@ -240,11 +236,9 @@ class MetricsManager {
             throw error;
         }
     }
-
     setMetricsUpdateCallback(callback) {
         this.onMetricsUpdate = callback;
     }
 }
 
-// Create global instance
 window.metricsManager = new MetricsManager();

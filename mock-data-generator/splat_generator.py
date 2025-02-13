@@ -77,7 +77,6 @@ class SplatGenerator:
                 0 <= new_y < self.config.grid.height and
                 0 <= new_z < self.config.grid.depth):
                 adjacent.append(f"{new_x}_{new_y}_{new_z}")
-            # print(f"Checking {new_x},{new_y},{new_z} -> valid: {0 <= new_x < self.config.grid.width and 0 <= new_y < self.config.grid.height and 0 <= new_z < self.config.grid.depth}")
             
         return adjacent
     

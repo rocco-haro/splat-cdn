@@ -5,8 +5,8 @@ CONFIG = {
     "endpoints": {
         "cdn": {
             "local": {
-                "single-tier": "http://localhost:8000/single-tier",
-                "two-tier": "http://localhost:8000/two-tier"
+                "single-tier": "https://localhost:8000/single-tier",
+                "two-tier": "https://localhost:8000/two-tier"
             },
             "deployed": {
                 "single-tier": "https://d1234.cloudfront.net",

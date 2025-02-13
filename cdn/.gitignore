@@ -27,3 +27,6 @@ Thumbs.db
 
 # Experiment-specific files
 experiments/**/config.json
+
+cert.pem
+key.pem

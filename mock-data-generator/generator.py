@@ -96,13 +96,11 @@ class ExperimentGenerator:
         
     def _validate_experiment(self, output_dir: Path, config: Any) -> None:
         """Validate that all required files and data are present and valid"""
-        # Check required files exist
         required_files = ["grid_map.json", "test_paths.json"]
         for file in required_files:
             if not (output_dir / file).exists():
                 raise ValueError(f"Missing required file: {file}")
                 
-        # Load and validate grid map
         with open(output_dir / "grid_map.json") as f:
             grid_map = json.load(f)
             
@@ -137,12 +135,10 @@ def main():
     parser.add_argument("--experiment", required=True, help="Experiment ID")
     args = parser.parse_args()
     
-    # Setup paths
     base_dir = Path(__file__).parent
     experiments_dir = base_dir / "experiments"
     output_dir = base_dir / "generated" / args.experiment
     
-    # Initialize and run generator
     config_loader = ConfigLoader(experiments_dir)
     generator = ExperimentGenerator(config_loader)
     

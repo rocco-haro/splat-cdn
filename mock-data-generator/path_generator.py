@@ -22,7 +22,7 @@ class TestPath:
 class PathGenerator:
     def __init__(self, config):
         self.config = config
-        self.points_per_second = 10  # Higher sampling rate for smoother movement
+        self.points_per_second = 10  # sampling rate
 
     def _get_splats_in_radius(self, position: Position) -> List[str]:
         """Get all splat IDs within loading radius of position"""
@@ -51,7 +51,7 @@ class PathGenerator:
     def _interpolate_positions(self, start: Position, end: Position, num_points: int) -> List[Position]:
         """Generate intermediate positions between start and end points"""
         if not isinstance(num_points, int):
-            num_points = int(num_points)  # Convert float to int if needed
+            num_points = int(num_points)
             
         if num_points < 1:
             raise ValueError("num_points must be at least 1")
@@ -73,12 +73,12 @@ class PathGenerator:
         post_teleport_duration = self.config.scenarios.teleport.post_teleport_duration
         teleport_duration = self.config.scenarios.teleport.teleport_duration
         
-        # Start in NY region (25% into grid)
+        # Start in quadrant (25% into grid)
         start_x = self.config.grid.width * 0.25
         start_z = self.config.grid.depth * 0.25
         start_pos = Position(x=start_x, y=0, z=start_z)
 
-        # End in LA region (75% into grid)
+        # End in other quadrant (75% into grid)
         end_x = self.config.grid.width * 0.75
         end_z = self.config.grid.depth * 0.75
         teleport_pos = Position(x=end_x, y=0, z=end_z)
@@ -147,7 +147,6 @@ class PathGenerator:
         center_z = self.config.grid.depth / 2
         points = []
         
-        # Parameters for a smoother, longer spiral
         max_radius = self.config.grid.loading_radius * 2
         total_points = int(duration * self.points_per_second)
         

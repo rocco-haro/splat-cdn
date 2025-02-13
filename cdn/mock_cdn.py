@@ -4,9 +4,9 @@ import os
 from dataclasses import dataclass
 from enum import Enum
 import time
-from typing import Dict, Optional, Tuple, List
+from typing import Dict, Optional, Tuple
 import asyncio
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -150,6 +150,31 @@ class MockCDN:
 # FastAPI app for mock CDN
 app = FastAPI()
 
+@app.get("/status")
+async def get_status(request: Request):
+    return {
+        "protocol": request.scope.get("http_version", "unknown"),
+        "transport": request.scope.get("type", "unknown"),
+        "client": request.scope.get("client", "unknown"),
+        "server": request.scope.get("server", "unknown"),
+        "scheme": request.scope.get("scheme", "unknown"),
+        "headers": dict(request.headers)
+    }
+
+@app.middleware("http")
+async def add_http3_headers(request: Request, call_next):
+    response = await call_next(request)
+    # Advertise HTTP/3 on the same port
+    alt_svc_header = 'h3=":8000"; ma=3600'
+    response.headers.update({
+        "Alt-Svc": alt_svc_header,
+        "Server": "hypercorn-h3",
+        "Upgrade": "h3",
+        "X-HTTP3-Available": "true",
+        "X-Available-Protocols": "h3,h2,http/1.1"
+    })
+    return response
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -167,19 +192,29 @@ class ContentUpload(BaseModel):
     content: str  # Base64 encoded content
 
 @app.get("/single-tier/content/{key}")
-async def get_content_single_tier(key: str):
+async def get_content_single_tier(key: str, request: Request):
     content, cache_status = await single_tier_cdn.get_content(key)
     return {
         "content": content.hex(),
-        "cache_status": cache_status
+        "cache_status": cache_status,
+        "protocol": request.scope.get("http_version", "unknown"),
+        "headers": dict(request.headers),
+        "client": request.scope.get("client", None),
+        "scheme": request.scope.get("scheme", None),
+        "transport": request.scope.get("type", None)
     }
 
 @app.get("/two-tier/content/{key}")
-async def get_content_two_tier(key: str):
+async def get_content_two_tier(key: str, request: Request):
     content, cache_status = await two_tier_cdn.get_content(key)
     return {
         "content": content.hex(),
-        "cache_status": cache_status
+        "cache_status": cache_status,
+        "protocol": request.scope.get("http_version", "unknown"),
+        "headers": dict(request.headers),
+        "client": request.scope.get("client", None),
+        "scheme": request.scope.get("scheme", None),
+        "transport": request.scope.get("type", None)
     }
 
 @app.put("/content")
@@ -197,5 +232,48 @@ async def get_metrics():
     }
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    import hypercorn.asyncio
+    import hypercorn.config
+    import logging
+    import socket
+    
+    logging.basicConfig(level=logging.DEBUG)
+    logger = logging.getLogger(__name__)
+    
+    def test_port(port):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            sock.bind(('0.0.0.0', port))
+            sock.close()
+            return True
+        except:
+            logger.error(f"Port {port} is not available")
+            return False
+    
+    for port in [8000, 4433]:
+        if not test_port(port):
+            raise RuntimeError(f"Port {port} is not available")
+    
+    config = hypercorn.config.Config()
+    
+    # QUIC transport settings
+    config.quic_bind = ["0.0.0.0:8000"]
+    config.bind = ["0.0.0.0:8000"]
+    
+    # QUIC parameters
+    config.max_incomplete_connection_attempts = 5
+    config.h3_max_concurrent_streams = 100
+    config.h3_initial_max_data = 1048576  # 1MB
+    config.h3_initial_max_stream_data_bidi_local = 262144  # 256KB
+    config.h3_initial_max_stream_data_bidi_remote = 262144  # 256KB
+    config.h3_initial_max_stream_data_uni = 262144  # 256KB
+    
+    config.alpn_protocols = ["h3", "h2", "http/1.1"]
+    # mkcert
+    config.certfile = "cert.pem"
+    config.keyfile = "key.pem"
+    config.verify_mode = None
+    config.debug = True
+    config.use_reloader = True
+    
+    asyncio.run(hypercorn.asyncio.serve(app, config))

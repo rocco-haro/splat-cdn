@@ -16,7 +16,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from lambda_handler import create_local_app, StorageBackend, CDNBackend
 from cdn.mock_cdn import app as cdn_app
 
-# Mock data
 MOCK_EXPERIMENT_CONFIG = {
     "scenarios": {
         "teleport": {
@@ -52,8 +51,6 @@ MOCK_TEST_PATHS = {
         }
     }
 }
-
-
 
 class MockStorageBackend(StorageBackend):
     def __init__(self, configs=None, paths=None):
@@ -93,7 +90,7 @@ def storage():
 
 @pytest.fixture
 def client(storage):
-    app = create_local_app(storage_backend=storage)  # Pass the storage backend explicitly
+    app = create_local_app(storage_backend=storage)
     return TestClient(app)
 
 @pytest.fixture
@@ -156,18 +153,6 @@ class TestCDNIntegration:
 
 @pytest.mark.asyncio
 class TestResultsEndpoints:
-    # @pytest.fixture
-    # def sample_result(self):
-    #     return {
-    #         "experiment_type": "single_tier",
-    #         "scenario": "teleport",
-    #         "metrics": {
-    #             "cache_hits": 150,
-    #             "cache_misses": 5,
-    #             "average_latency": 45.2
-    #         }
-    #     }
-
     async def test_post_results_with_cdn_metrics(self, client, sample_result, async_client):
         # First ensure mock CDN has some metrics
         await async_client.put(

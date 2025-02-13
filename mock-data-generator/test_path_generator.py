@@ -16,7 +16,6 @@ from config import (
 
 class MockConfigLoader:
     def load_experiment(self, experiment_id: str):
-        # Return a test configuration
         class Config:
             pass
         
