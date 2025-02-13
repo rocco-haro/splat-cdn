@@ -17,7 +17,13 @@ We'll deploy to AWS lambda, cloudfront, and S3 using Terraform scripts and the a
 * valid path and data generation
 * lambda services to receive paths
 * mock cdn with http 1.1,2 and 3 support 
-* functional client that runs simulations 
+* functional client that runs simulations
+
+  
+
+https://github.com/user-attachments/assets/525af1b4-ef16-49d9-bd87-600540e30cba
+
+
 
 ## TODO:
 * Tune the data generation to support experiments to prove the null hypothesis 
